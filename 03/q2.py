@@ -42,29 +42,11 @@ def main():
     raw_data = get_input()
     total = 0
     for y in range(0, len(raw_data)):
-        ispart = False
-        isnum = False
-        num = ""
+        ispart = 0
         for x in range(0, len(raw_data[0])):
-            if raw_data[y][x].isdigit():
-                if not isnum:
-                    isnum = True
-                num = num + raw_data[y][x]
-                if not ispart:
-                    ispart = search(y, x, raw_data)
-                if ispart and x == len(raw_data)-1:
-                    # print(num)
-                    total += int(num)
-            else:
-                if isnum and ispart:
-                    # print(num)
-                    total += int(num)
-                    isnum = False
-                    ispart = False
-                    num = ""
-                elif isnum:
-                    isnum = False
-                    num = ""
+            if raw_data[y][x] == "*":
+                ispart = search(y, x, raw_data)
+                total += ispart
     print(total)
 
 
