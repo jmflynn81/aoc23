@@ -12,6 +12,7 @@ LIST = {
     "nine": "9"
 }
 
+
 def get_input():
     with open("input.txt") as f:
         raw_data = f.read().splitlines()
@@ -23,7 +24,7 @@ def get_number(data, direction):
 
     for word in LIST:
         tmp_data = re.sub(word, LIST[word], data)
-        
+
         counter = 0
         for tmp_last in tmp_data[::direction]:
             if re.match(r"[0-9]", tmp_last):
