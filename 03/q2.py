@@ -1,3 +1,5 @@
+import re
+
 def get_input():
     with open("input.txt") as f:
         raw_data = f.read().splitlines()
@@ -9,33 +11,85 @@ def search(y, x, data):
     max_y = len(data) -1
     max_x = len(data[0]) -1
     # print(f"max_y: {max_y}, max_x: {max_x}")
-    count_y = 2
-    count_x = 2
+
     start_y = y-1
-    start_x = x-1
+    if start_y < 0:
+        start_y = 0
 
-    if y == 0:
-        start_y = y
-    elif y != max_y:
-        count_y = 3
-
-    if x == 0:
-        start_x = x
-    elif x != max_x:
-        count_x = 3
-
-    for y_cord in range(start_y, start_y+count_y):
-        for x_cord in range(start_x, start_x+count_x):
-            # print(f"y: {y_cord}, x: {x_cord}")
-            if y_cord == y and x_cord == x:
-                # print("original char, skipping....")
-                continue
-            char = data[y_cord][x_cord]
-            # print(f"y: {y}, x: {x}, y_cord: {y_cord}, x_cord: {x_cord}, char: {char}")
-            if not char.isdigit() and char != ".":
-                return True
-    return False
+    start_x = x-3
+    if start_x < 0:
+        start_x = 0
     
+    end_y = y+1
+    if end_y > max_y:
+        end_y = max_y
+    
+    end_x = x+3
+    if end_x > max_x:
+        end_x = max_x
+
+    gears = 0
+    ltv = 1
+    rtv = 1
+    lmv = 1
+    rmv = 1
+    lbv = 1
+    rbv = 1
+    if start_y != y:
+        top_check = data[start_y][start_x:end_x+1]
+        
+        for tc in re.finditer("\d+", top_check):
+            # print(list(range(tc.start(), tc.end())))
+            if tc.start == 2 or tc.end() == 3:
+                ltv = int(tc.group())
+                gears += 1
+            if tc.start() in [3, 4] or tc.end() in [4, 5]: # <----start here tomorrow
+                rtv = int(tc.group())
+                gears += 1
+                if ltv == rtv:
+                    rtv = 1
+                    gears -= 1
+            
+    mid_check = data[y][start_x:end_x+1]
+    for mc in re.finditer("\d+", mid_check):
+        if mc.end() == 3:
+            lmv = int(mc.group())
+            gears += 1
+        if mc.start() == 4:
+            rmv = int(mc.group())
+            gears += 1
+
+    if end_y != y:
+        bottom_check = data[end_y][start_x:end_x+1]
+        for bc in re.finditer("\d+", bottom_check):
+            # print(list(range(bc.start(), bc.end())))
+            if bc.start() == 2 or bc.end() == 3:
+                lbv = int(bc.group())
+                gears += 1
+            if bc.start() in [3, 4] or bc.end() in [4, 5]:
+                rbv = int(bc.group())
+                gears += 1
+                if lbv == rbv:
+                    rbv = 1
+                    gears -= 1
+
+                
+
+    # print(top_check, tv)
+    # print(mid_check, mv)
+    # print(bottom_check, bv)
+    # print()
+    print(f"ltv: {ltv}, rtv: {rtv}, lmv: {lmv}, rmv: {rmv}, lbv: {lbv}, rbv: {rbv}, gears: {gears} [{top_check}][{mid_check}][{bottom_check}]")
+    # print(f"top_values: {top_check}, found: {tv}")
+    # print(f"lmd_values: {mid_check}, found: {lmv}")
+    # print(f"rmd_values: {mid_check}, found: {rmv}")
+    # print(f"bot_values: {bottom_check}, found: {bv}, ({bc.start()},{bc.end()})")
+    # print()
+    product = rtv * ltv * rmv * lmv * rbv * lbv
+    if product == 1 or gears != 2:    
+        return 0
+    else:
+        return product
 
 
 def main():
@@ -52,3 +106,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# 0123456
+# 999.999
+# 999*999
+# 999.999
+
+# ...
+# .*.
+# ...
+
+# -1,-1;-1,0;-1,1
